@@ -7,6 +7,7 @@ import { ConsultationTrendChart } from '../../components/dashboard/ConsultationT
 import { ReportsOverviewChart } from '../../components/dashboard/ReportsOverviewChart';
 import { RecentActivityFeed } from '../../components/dashboard/RecentActivityFeed';
 import { AddPatientModal } from '../../components/dashboard/AddPatientModal';
+import { QrScannerModal } from '../../components/common/QrScannerModal';
 import { Button } from '../../components/ui/Button';
 import { CardSkeleton } from '../../components/ui/CardSkeleton';
 import { TableSkeleton } from '../../components/ui/TableSkeleton';
@@ -21,7 +22,7 @@ import { getDashboardMetrics } from '../../services/dashboardService';
 import { clearDatabase, seedDemoDatabase } from '../../services/storage';
 
 import { Doctor, Patient, MedicationReminder, MetricData, ConsultationTrendPoint, ReportsOverviewData, ActivityItem } from '../../types';
-import { Plus, Calendar, AlertTriangle, RefreshCw, Database, Trash2 } from 'lucide-react';
+import { Plus, Calendar, AlertTriangle, RefreshCw, Database, Trash2, QrCode } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 
 export const DashboardPage: React.FC = () => {
@@ -44,6 +45,7 @@ export const DashboardPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hasError, setHasError] = useState<boolean>(false);
   const [isAddPatientOpen, setIsAddPatientOpen] = useState<boolean>(false);
+  const [isScannerOpen, setIsScannerOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const loadDashboardData = useCallback(async () => {
@@ -110,7 +112,6 @@ export const DashboardPage: React.FC = () => {
       {/* Top Welcome Header Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-2 border-b border-slate-200/60">
         <div>
-          {/* Greeting Typography: Visually prominent and stronger */}
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-navy-900">
             Good morning, {doctor ? doctor.name : 'Doctor'}
           </h1>
@@ -124,9 +125,9 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Action Controls */}
-        <div className="flex items-center space-x-3 shrink-0">
-          <div className="inline-flex items-center px-3.5 py-2 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-navy-700 shadow-subtle">
+        {/* Right Action Controls: [ + Add Patient ] [ Scan Patient QR ] */}
+        <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+          <div className="hidden lg:inline-flex items-center px-3 py-2 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-navy-700 shadow-subtle">
             <Calendar className="w-4 h-4 text-brand-600 mr-2" />
             <span>Today, 26 Oct 2026</span>
           </div>
@@ -137,6 +138,16 @@ export const DashboardPage: React.FC = () => {
             leftIcon={<Plus className="w-4 h-4" />}
           >
             Add Patient
+          </Button>
+
+          <Button
+            size="md"
+            variant="outline"
+            onClick={() => setIsScannerOpen(true)}
+            leftIcon={<QrCode className="w-4 h-4 text-brand-600" />}
+            className="border-brand-200 hover:bg-brand-50 hover:text-brand-700"
+          >
+            Scan Patient QR
           </Button>
         </div>
       </div>
@@ -221,7 +232,7 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Dev Test Data Controls Footer (For convenient Empty DB verification) */}
+          {/* Dev Test Data Controls Footer */}
           <div className="pt-6 border-t border-slate-200/60 flex items-center justify-between text-xs text-navy-500">
             <div className="flex items-center space-x-2">
               <Database className="w-4 h-4 text-brand-600" />
@@ -250,11 +261,18 @@ export const DashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* Add Patient Modal */}
+      {/* Add Patient Intake Modal */}
       <AddPatientModal
         isOpen={isAddPatientOpen}
         onClose={() => setIsAddPatientOpen(false)}
         onPatientAdded={handlePatientAdded}
+      />
+
+      {/* QR Scanner Camera Modal */}
+      <QrScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        currentDoctorId={doctor?.id || 'doc-001'}
       />
     </AppShell>
   );

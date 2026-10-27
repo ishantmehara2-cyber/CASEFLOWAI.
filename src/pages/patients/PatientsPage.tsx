@@ -1,15 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AppShell } from '../../components/layout/AppShell';
 import { RecentPatientsTable } from '../../components/dashboard/RecentPatientsTable';
-import { demoPatients } from '../../data/patientsData';
+import { getPatients } from '../../services/patientService';
 import { Button } from '../../components/ui/Button';
 import { AddPatientModal } from '../../components/dashboard/AddPatientModal';
-import { Plus, Users } from 'lucide-react';
+import { QrScannerModal } from '../../components/common/QrScannerModal';
+import { Plus, Users, QrCode } from 'lucide-react';
+import { Patient } from '../../types';
 
 export const PatientsPage: React.FC = () => {
-  const [patients, setPatients] = useState(demoPatients);
+  const [patients, setPatients] = useState<Patient[]>([]);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const loadPatients = useCallback(async () => {
+    const list = await getPatients();
+    setPatients(list);
+  }, []);
+
+  useEffect(() => {
+    loadPatients();
+  }, [loadPatients]);
 
   const filtered = patients.filter(
     (p) =>
@@ -27,12 +39,22 @@ export const PatientsPage: React.FC = () => {
             Patient Management Directory
           </h1>
           <p className="text-xs text-navy-500 mt-0.5">
-            Full clinical patient directory, history, and uploaded intake files
+            Full clinical patient directory, history, and secure QR identities
           </p>
         </div>
-        <Button size="sm" onClick={() => setIsAddOpen(true)} leftIcon={<Plus className="w-4 h-4" />}>
-          Add New Patient
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button size="sm" onClick={() => setIsAddOpen(true)} leftIcon={<Plus className="w-4 h-4" />}>
+            Add New Patient
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setIsScannerOpen(true)}
+            leftIcon={<QrCode className="w-4 h-4 text-brand-600" />}
+          >
+            Scan Patient QR
+          </Button>
+        </div>
       </div>
 
       <RecentPatientsTable patients={filtered} onAddPatient={() => setIsAddOpen(true)} />
@@ -40,7 +62,12 @@ export const PatientsPage: React.FC = () => {
       <AddPatientModal
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
-        onAddPatient={(newP) => setPatients([newP, ...patients])}
+        onPatientAdded={loadPatients}
+      />
+
+      <QrScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
       />
     </AppShell>
   );

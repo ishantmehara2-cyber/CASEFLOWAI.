@@ -4,7 +4,8 @@ import { PatientAvatar } from '../ui/PatientAvatar';
 import { StatusBadge } from '../ui/StatusBadge';
 import { Button } from '../ui/Button';
 import { EmptyState } from '../ui/EmptyState';
-import { MoreVertical, Eye, ArrowUpRight, FileText, UserPlus, Users } from 'lucide-react';
+import { PatientQrCardModal } from '../common/PatientQrCardModal';
+import { MoreVertical, Eye, ArrowUpRight, FileText, UserPlus, Users, QrCode } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../context/ToastContext';
 
@@ -21,11 +22,12 @@ export const RecentPatientsTable: React.FC<RecentPatientsTableProps> = ({
 }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+  const [selectedQrPatient, setSelectedQrPatient] = useState<Patient | null>(null);
 
   const handlePatientClick = (patient: Patient) => {
-    showToast('Patient Record', `Opening clinical file for ${patient.name} (${patient.patientId})`, 'info');
-    navigate('/patients');
+    navigate(`/patients/${patient.id}`);
   };
 
   return (
@@ -138,6 +140,15 @@ export const RecentPatientsTable: React.FC<RecentPatientsTableProps> = ({
                       <Button
                         variant="outline"
                         size="sm"
+                        onClick={() => setSelectedQrPatient(patient)}
+                        leftIcon={<QrCode className="w-3.5 h-3.5 text-brand-600" />}
+                        title="View & Print Patient QR Identity Card"
+                      >
+                        QR
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => handlePatientClick(patient)}
                         leftIcon={<Eye className="w-3.5 h-3.5" />}
                       >
@@ -163,29 +174,20 @@ export const RecentPatientsTable: React.FC<RecentPatientsTableProps> = ({
                               <button
                                 onClick={() => {
                                   setActiveMenuId(null);
+                                  setSelectedQrPatient(patient);
+                                }}
+                                className="w-full px-3 py-2 text-navy-700 hover:bg-slate-50 flex items-center"
+                              >
+                                View QR Card
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setActiveMenuId(null);
                                   handlePatientClick(patient);
                                 }}
                                 className="w-full px-3 py-2 text-navy-700 hover:bg-slate-50 flex items-center"
                               >
-                                Clinical Summary
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setActiveMenuId(null);
-                                  navigate('/consultations');
-                                }}
-                                className="w-full px-3 py-2 text-navy-700 hover:bg-slate-50 flex items-center"
-                              >
-                                Start Consultation
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setActiveMenuId(null);
-                                  navigate('/prescriptions');
-                                }}
-                                className="w-full px-3 py-2 text-navy-700 hover:bg-slate-50 flex items-center"
-                              >
-                                Add Prescription
+                                Clinical Profile
                               </button>
                             </div>
                           </>
@@ -199,6 +201,13 @@ export const RecentPatientsTable: React.FC<RecentPatientsTableProps> = ({
           </table>
         </div>
       )}
+
+      {/* QR Card Modal */}
+      <PatientQrCardModal
+        isOpen={!!selectedQrPatient}
+        onClose={() => setSelectedQrPatient(null)}
+        patient={selectedQrPatient}
+      />
     </div>
   );
 };
