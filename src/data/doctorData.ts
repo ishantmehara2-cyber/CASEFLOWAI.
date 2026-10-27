@@ -1,0 +1,27 @@
+import { Doctor } from '../types';
+
+export const currentDoctor: Doctor = {
+  id: 'doc-001',
+  firstName: 'Priya',
+  lastName: 'Sharma',
+  name: 'Dr. Priya Sharma',
+  specialization: 'General Physician',
+  email: 'priya.sharma@caseflowai.med',
+  phone: '+91 98765 43210',
+  medicalRegistrationNumber: 'MCI-2018-98421',
+  qualification: 'MBBS, MD (General Medicine)',
+  yearsOfExperience: 8,
+  medicalCouncil: 'Maharashtra Medical Council',
+  clinicName: 'Apollo Clinical Care Center',
+  clinicAddress: '124, Healthcare Avenue, Bandra West',
+  clinicCity: 'Mumbai',
+  clinicState: 'Maharashtra',
+  clinicPin: '400050',
+  clinicPhone: '+91 22 2654 8900',
+  clinicEmail: 'contact@apolloclinicbandra.med',
+  website: 'https://apolloclinicbandra.med',
+  clinicLicenseNumber: 'CLN-89421-MH',
+  profilePhoto: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=200&h=200',
+  approvalStatus: 'Approved',
+  role: 'doctor',
+};
