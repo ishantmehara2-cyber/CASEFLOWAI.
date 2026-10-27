@@ -82,6 +82,15 @@ export const DashboardPage: React.FC = () => {
 
   useEffect(() => {
     loadDashboardData();
+
+    const handleDoctorUpdate = () => {
+      getCurrentDoctor().then(setDoctor);
+    };
+
+    window.addEventListener('caseflow_doctor_updated', handleDoctorUpdate);
+    return () => {
+      window.removeEventListener('caseflow_doctor_updated', handleDoctorUpdate);
+    };
   }, [loadDashboardData]);
 
   const handlePatientAdded = () => {
